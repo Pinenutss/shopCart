@@ -1,0 +1,201 @@
+<wxs module="filters" src="../../filter/filters.wxs"></wxs>
+<view class="container">
+  <view class='addAppMask' bindtap='closeAddAppMask' wx:if='{{addAppMaskStatus}}'>
+    <view class='img-wrap'>
+      <image src='../../resources/images/addapp.png'></image>
+    </view>
+  </view>
+  <view class="content-container">
+    <!-- 左边 -->
+    <scroll-view class='classify-container left' scroll-y="true">
+      <view class='classify-container-bg'>
+        <view class='img-wrap'>
+          <image src='../../resources/images/index.png' bindtap='goIndex'></image>
+        </view>
+        <!-- <view class='item {{active ? "active" : ""}}' wx-for='{{shop.data}}'>分类1 {{shop}}</view> -->
+        <view class="item {{classifySeleted==classify.id?'active':''}}" wx:for="{{shop.data}}" wx:key="id" wx:for-item="classify" data-id="{{classify.id}}" bindtap="tapClassify">
+          {{classify.name}}
+        </view>
+      </view>
+    </scroll-view>
+    <!-- 右边 -->
+    <scroll-view class='goods-container left' scroll-y="true" scroll-into-view="{{classifyViewed}}" bindscroll="onGoodsScroll" scroll-with-animation="true" style="height:{{scrollHeight - 80}}px">
+      <view class='classify' wx:for="{{shop.data}}" wx:for-item="classify" wx:for-index="classifyIndex" wx:key="id" id="{{classify.id}}">
+        <view class='title'>{{classify.name}}</view>
+        <view class='item' wx:for='{{classify.menu}}' wx:for-item="menu" wx:for-index="menuIndex" wx:key="id">
+          <view class='left-box'>
+            <image src="{{menu.img ? menu.img : defaultImg}}"></image>
+          </view>
+          <view class='right'>
+            <view class='name text-hide1'>{{menu.name}}</view>
+            <view class='price-num-wrap'>
+              <view class='price'>￥{{menu.price}}</view>
+
+              <!-- 无规格 -->
+              <view class='num-wrap' wx:if="{{menu.menu == null}}">
+                <image wx:if="{{menu.num}}" src='../../resources/images/reduce_icon.png' bindtap="reduceCart" data-id="{{menu.id}}" data-name="{{menu.name}}" data-price="{{menu.price}}" data-spec='{{menu.spec}}' data-num="{{menu.num}}" data-img="{{menu.img}}"></image>
+                <text wx:if="{{menu.num}}">{{menu.num}}</text>
+                <image src='../../resources/images/add_icon.png' bindtap="addCart" data-id="{{menu.id}}" data-name="{{menu.name}}" data-price="{{menu.price}}" data-spec='{{menu.spec}}' data-num="{{menu.num}}" data-img="{{menu.img}}"></image>
+              </view>
+
+              <!-- 有规格 -->
+              <view class='select-spec' wx:if="{{menu.menu && menu.menu.length > 1}}" bindtap="selectSpec" data-id="{{menu.id}}" data-classifyindex="{{classifyIndex}}" data-menuIndex="{{menuIndex}}">
+                选规格
+                <view class='icon-num' wx:if="{{menu.num > 0}}">{{menu.num}}</view>
+              </view>
+            </view>
+          </view>
+          <!-- 选择规格弹窗 -->
+          <!-- <view class='select-spec-pop' wx:if="{{menu.id === activeSpecItemsId}}">
+            <view class='mask' catchtap="selectGoodsModalStatus"></view>
+            <view class='wrap'>
+              <view class='top-box'>{{menu.name}}</view>
+              <view class='center-box'>
+                <view class='item' wx:for="{{menu.menu}}" wx:for-item="specItem" wx:key="index" wx:for-index="specIndex">
+                  <view class='goods-spec'>{{specItem.spec}}</view>
+                  <view class='goods-price'>￥{{specItem.price}}</view>
+                  <view class='num-wrap'>
+                    <image wx:if="{{specItem.num}}" src='../../resources/images/reduce_icon.png' bindtap="reduceCart" data-id="{{specItem.id}}" data-name="{{menu.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}"></image>
+                    <text wx:if="{{specItem.num}}">{{specItem.num}}</text>
+                    <image src='../../resources/images/add_icon.png' bindtap="addCart" data-id="{{specItem.id}}" data-name="{{menu.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}"></image>
+                  </view>
+                </view>
+              </view>
+              <view class='bottom-box'>
+                <view class='left-box'>已选 {{menu.num}}</view>
+                <view class='right-box'>合计金额
+                  <text>￥{{menu.total}}</text> </view>
+              </view>
+            </view>
+          </view> -->
+        </view>
+      </view>
+    </scroll-view>
+    <!-- <scroll-view class='goods-container' scroll-y="true">
+      <view class='classify'>
+        <view class='title'>分类1</view>
+        <view class='item'>
+          <view class='left-box'>
+            <image src="http://iph.href.lu/124x124"></image>
+          </view>
+          <view class='right'>
+            <view class='name'>菜名菜名</view>
+            <view class='price-num-wrap'>
+              <view class='price'>￥9.8</view>
+              <view class='num-wrap'>
+                <image src='http://iph.href.lu/40x40'></image>
+                <text>2</text>
+                <image src='http://iph.href.lu/40x40'></image>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </scroll-view> -->
+  </view>
+  <!-- 购物车 -->
+  <view class='shopping-cart-bg'>
+    <view class='shopping-cart'>
+      <view class='left-box'>
+        <view class='icon-wrap' bindtap="changeCardDetailStatus">
+          <image src='../../resources/images/shopping_car.png' class='icon-card'></image>
+          <view class='icon-num' wx:if="{{cart.count > 0}}">{{cart.count}}</view>
+        </view>
+        <view class='price' wx:if="{{cart.count > 0}}">￥{{cart.total}}</view>
+      </view>
+      <view class='right-box'>
+        <view bindtap='goSureOrder' wx:if="{{orderType === 0}}">下单支付</view>
+        <view bindtap='goEditOrder' wx:if="{{orderType === 1}}">确认修改</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 购物车详情 -->
+  <view class='cart-details' wx:if="{{cardDetailStatus}}">
+    <view class='mask' bindtap="changeCardDetailStatus"></view>
+    <view class='content'>
+      <view class='title'>
+        <view class='left-box'>已选择菜品</view>
+        <view class='right-box' bindtap="clearCart">
+          <text>全部清空</text>
+          <image src='../../resources/images/delete_icon.png'></image>
+        </view>
+      </view>
+      <view class='item-wrap'>
+        <view class='item' wx:for="{{localList}}" wx:for-item="order" wx:key="index">
+          <view class='goods-name'>{{order.name}}</view>
+          <view class='goods-spec'>{{order.spec}}</view>
+          <view class='goods-price'>￥{{filters.toFix2(order.price*order.num)}}</view>
+          <view class='num-wrap'>
+            <image src='../../resources/images/reduce_icon.png' bindtap="reduceCart" data-id="{{order.id}}" data-name="{{order.name}}" data-price="{{order.price}}" data-spec='{{order.spec}}' data-num="{{order.num}}"></image>
+            <text>{{order.num}}</text>
+            <image src='../../resources/images/add_icon.png' bindtap="addCart" data-id="{{order.id}}" data-name="{{order.name}}" data-price="{{order.price}}" data-spec='{{order.spec}}' data-num="{{order.num}}"></image>
+          </view>
+        </view>
+
+        <!-- <view class='item'>
+          <view class='goods-name'>手撕鸡拼鼓油鸡</view>
+          <view class='goods-spec'>二两</view>
+          <view class='goods-price'>￥9.00</view>
+          <view class='num-wrap'>
+            <image src='../../resources/images/reduce_icon.png'></image>
+            <text>2</text>
+            <image src='../../resources/images/add_icon.png'></image>
+          </view>
+        </view> -->
+      </view>
+    </view>
+  </view>
+  <!-- 选择规格 -->
+  <!-- <view class='select-spec-pop' wx:if="{{goodsModalStatus}}">
+    <view class='mask' bindtap="selectGoodsModalStatus"></view>
+    <view class='wrap'>
+      <view class='top-box'>{{activeSpec.name}}</view>
+      <view class='center-box'>
+        <view class='item' wx:for="{{activeSpec.menu}}" wx:for-item="specItem" wx:key="index" wx:for-index="specIndex">
+          <view class='goods-spec'>{{specItem.spec}}</view>
+          <view class='goods-price'>￥{{specItem.price}}</view>
+          <view class='num-wrap'>
+            <image wx:if="{{specItem.num}}" src='../../resources/images/reduce_icon.png' bindtap="reduceCart" data-id="{{specItem.id}}" data-name="{{activeSpec.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}" data-pop="true"></image>
+            <text wx:if="{{specItem.num}}">{{specItem.num}}</text>
+            <image src='../../resources/images/add_icon.png' bindtap="addCart" data-id="{{specItem.id}}" data-name="{{activeSpec.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}" data-pop="true"></image>
+          </view>
+        </view>
+      </view>
+      <view class='bottom-box'>
+        <view class='left-box'>已选 {{activeSpec.num}}</view>
+        <view class='right-box'>合计金额
+          <text>￥{{activeSpec.total}}</text> </view>
+      </view>
+    </view>
+  </view> -->
+  <block wx:for="{{shop.data}}" wx:for-item="classify" wx:for-index="classifyIndex" wx:key="id" id="{{classify.id}}">
+    <block wx:for='{{classify.menu}}' wx:for-item="menu" wx:for-index="menuIndex" wx:key="id">
+      <block wx:if="{{menu.menu && menu.menu.length > 1}}">
+        <view class='select-spec-pop' wx:if="{{menu.id === activeSpecItemsId}}">
+          <view class='mask' catchtap="selectGoodsModalStatus"></view>
+          <view class='wrap'>
+            <view class='top-box text-hide1'>{{menu.name}}</view>
+            <view class='center-box'>
+              <view class='item' wx:for="{{menu.menu}}" wx:for-item="specItem" wx:key="index" wx:for-index="specIndex">
+                <view class='goods-spec'>{{specItem.spec}}</view>
+                <view class='goods-price'>￥{{specItem.price}}</view>
+                <view class='num-wrap'>
+                  <image wx:if="{{specItem.num}}" src='../../resources/images/reduce_icon.png' bindtap="reduceCart" data-id="{{specItem.id}}" data-name="{{menu.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}" data-img="{{menu.img}}"></image>
+                  <text wx:if="{{specItem.num}}">{{specItem.num}}</text>
+                  <image src='../../resources/images/add_icon.png' bindtap="addCart" data-id="{{specItem.id}}" data-name="{{menu.name}}" data-price="{{specItem.price}}" data-spec='{{specItem.spec}}' data-num="{{specItem.num}}" data-img="{{menu.img}}"></image>
+                </view>
+              </view>
+            </view>
+            <view class='bottom-box'>
+              <view class='left-box'>已选 {{menu.num}}</view>
+              <view class='right-box'>合计金额
+                <text>￥{{menu.total}}</text> </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+  </block>
+  <view class='mask-all-page' wx:if="{{maskAllPage === true}}"></view>
+</view>

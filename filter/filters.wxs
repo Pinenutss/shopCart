@@ -1,0 +1,11 @@
+var filters = {
+  toFix2: function (money) {
+    if (money.toString().indexOf(".") != -1 && money.toString().split(".")[1].length > 2) {
+      money = parseFloat(money).toFixed(2);
+    }
+    return parseFloat(money)
+  }
+}
+module.exports = {
+  toFix2: filters.toFix2
+}
