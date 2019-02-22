@@ -98,7 +98,7 @@
              "price": 13,
              "total": 0,
              "num": 0,
-             "menu": null
+             "menu": [{ id: "1-1", spec: "小份", price: 13, num: 0 }, { id: "1-2", spec: "大份", price: 21, num: 0}]
            }, {
              "id": 11,
              "name": "小白菜鸡蛋汤",
